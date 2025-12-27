@@ -7,6 +7,14 @@ import numpy as np
 import matplotlib.pyplot as plt
 import soundfile as sf
 from scipy import signal
+import arabic_reshaper
+from bidi.algorithm import get_display
+
+def farsi_text(text):
+    """تبدیل متن فارسی برای نمایش صحیح در نمودارها"""
+    reshaped_text = arabic_reshaper.reshape(text)  # اصلاح شکل حروف
+    bidi_text = get_display(reshaped_text)  # راست‌چین کردن
+    return bidi_text
 
 # خواندن فایل صوتی
 audio_file = None
@@ -186,25 +194,28 @@ print(f"واکدار: {voiced_count} فریم ({voiced_count/num_frames*100:.1f}
 # ایجاد نمودار نهایی
 plt.figure(figsize=(16, 12))
 
+# تنظیم فونت فارسی (اگر فونت خاصی دارید مسیر آن را بدهید، در غیر این صورت نام فونت نصب شده را بنویسید)
+# plt.rcParams[\'font.family\'] = \'Vazir\')
+
 # نمودار سیگنال اصلی
 time_axis = np.arange(len(audio_data)) / sample_rate
 plt.subplot(6, 1, 1)
 plt.plot(time_axis, audio_data, 'b-', linewidth=0.5)
-plt.title('سیگنال صوتی اصلی', fontsize=14, fontfamily='DejaVu Sans')
-plt.xlabel('زمان (ثانیه)', fontsize=12)
-plt.ylabel('دامنه', fontsize=12)
+plt.title(farsi_text('سیگنال صوتی اصلی'), fontsize=14)
+plt.xlabel(farsi_text('زمان (ثانیه)'), fontsize=12)
+plt.ylabel(farsi_text('دامنه'), fontsize=12)
 plt.grid(True, alpha=0.3)
 
 # نمودار انرژی
 plt.subplot(6, 1, 2)
-plt.plot(frame_times, short_term_energy, 'b-', linewidth=1.5, label='انرژی')
+plt.plot(frame_times, short_term_energy, 'b-', linewidth=1.5, label=farsi_text('انرژی'))
 plt.axhline(y=silence_energy_threshold, color='r', linestyle='--', 
-            label='آستانه سکوت', alpha=0.7)
+            label=farsi_text('آستانه سکوت'), alpha=0.7)
 plt.axhline(y=voiced_energy_threshold, color='g', linestyle='--', 
-            label='آستانه واکدار', alpha=0.7)
-plt.title('انرژی کوتاه‌مدت', fontsize=14, fontfamily='DejaVu Sans')
-plt.xlabel('زمان (ثانیه)', fontsize=12)
-plt.ylabel('انرژی', fontsize=12)
+            label=farsi_text('آستانه واکدار'), alpha=0.7)
+plt.title(farsi_text('انرژی کوتاه‌مدت'), fontsize=14)
+plt.xlabel(farsi_text('زمان (ثانیه)'), fontsize=12)
+plt.ylabel(farsi_text('انرژی'), fontsize=12)
 plt.legend()
 plt.grid(True, alpha=0.3)
 
@@ -212,42 +223,42 @@ plt.grid(True, alpha=0.3)
 plt.subplot(6, 1, 3)
 plt.plot(frame_times, zcr_values, 'r-', linewidth=1.5, label='ZCR')
 plt.axhline(y=voiced_zcr_threshold, color='g', linestyle='--', 
-            label='آستانه واکدار', alpha=0.7)
+            label=farsi_text('آستانه واکدار'), alpha=0.7)
 plt.axhline(y=unvoiced_zcr_threshold, color='orange', linestyle='--', 
-            label='آستانه بی‌واک', alpha=0.7)
-plt.title('نرخ عبور از صفر (ZCR)', fontsize=14, fontfamily='DejaVu Sans')
-plt.xlabel('زمان (ثانیه)', fontsize=12)
-plt.ylabel('ZCR', fontsize=12)
+            label=farsi_text('آستانه بی‌واک'), alpha=0.7)
+plt.title(farsi_text('نرخ عبور از صفر (ZCR)'), fontsize=14)
+plt.xlabel(farsi_text('زمان (ثانیه)'), fontsize=12)
+plt.ylabel(farsi_text('ZCR'), fontsize=12)
 plt.legend()
 plt.grid(True, alpha=0.3)
 
 # نمودار قدرت اتوکرولیشن
 plt.subplot(6, 1, 4)
 plt.plot(frame_times, autocorr_strength, 'g-', linewidth=1.5, 
-         label='قدرت قله اتوکرولیشن')
+         label=farsi_text('قدرت قله اتوکرولیشن'))
 plt.axhline(y=voiced_autocorr_threshold, color='g', linestyle='--', 
-            label='آستانه واکدار', alpha=0.7)
+            label=farsi_text('آستانه واکدار'), alpha=0.7)
 plt.axhline(y=unvoiced_autocorr_threshold, color='orange', linestyle='--', 
-            label='آستانه بی‌واک', alpha=0.7)
-plt.title('قدرت قله اتوکرولیشن', fontsize=14, fontfamily='DejaVu Sans')
-plt.xlabel('زمان (ثانیه)', fontsize=12)
-plt.ylabel('قدرت', fontsize=12)
+            label=farsi_text('آستانه بی‌واک'), alpha=0.7)
+plt.title(farsi_text('قدرت قله اتوکرولیشن'), fontsize=14)
+plt.xlabel(farsi_text('زمان (ثانیه)'), fontsize=12)
+plt.ylabel(farsi_text('قدرت'), fontsize=12)
 plt.legend()
 plt.grid(True, alpha=0.3)
 
 # نمودار طبقه‌بندی
 plt.subplot(6, 1, 5)
 colors = ['gray', 'orange', 'green']
-labels = ['سکوت', 'بی‌واک', 'واکدار']
+labels = [farsi_text('سکوت'), farsi_text('بی‌واک'), farsi_text('واکدار')]
 for i, (color, label) in enumerate(zip(colors, labels)):
     mask = classification_combined == i
     if np.any(mask):
         plt.scatter(frame_times[mask], classification_combined[mask], 
                    c=color, label=label, s=20, alpha=0.6)
-plt.title('طبقه‌بندی نهایی (ترکیب ZCR + انرژی + اتوکرولیشن)', 
-          fontsize=14, fontfamily='DejaVu Sans')
-plt.xlabel('زمان (ثانیه)', fontsize=12)
-plt.ylabel('دسته', fontsize=12)
+plt.title(farsi_text('طبقه‌بندی نهایی (ترکیب ZCR + انرژی + اتوکرولیشن)'), 
+          fontsize=14)
+plt.xlabel(farsi_text('زمان (ثانیه)'), fontsize=12)
+plt.ylabel(farsi_text('دسته'), fontsize=12)
 plt.yticks([0, 1, 2], labels)
 plt.legend()
 plt.grid(True, alpha=0.3, axis='y')
@@ -268,10 +279,10 @@ for i, (color, label) in enumerate(zip(colors, labels)):
         plt.plot(time_axis[mask], audio_data[mask], 
                 color=color, linewidth=1.5, label=label, alpha=0.8)
 
-plt.title('سیگنال نهایی با بخش‌های واکدار، بی‌واک و سکوت مشخص‌شده', 
-          fontsize=14, fontfamily='DejaVu Sans')
-plt.xlabel('زمان (ثانیه)', fontsize=12)
-plt.ylabel('دامنه', fontsize=12)
+plt.title(farsi_text('سیگنال نهایی با بخش‌های واکدار، بی‌واک و سکوت مشخص‌شده'), 
+          fontsize=14)
+plt.xlabel(farsi_text('زمان (ثانیه)'), fontsize=12)
+plt.ylabel(farsi_text('دامنه'), fontsize=12)
 plt.legend(loc='upper right')
 plt.grid(True, alpha=0.3)
 
@@ -291,21 +302,21 @@ for i, (color, label) in enumerate(zip(colors, labels)):
         plt.plot(time_axis[mask], audio_data[mask], 
                 color=color, linewidth=2, label=label, alpha=0.9)
 
-plt.title('سیگنال صوتی با طبقه‌بندی: واکدار (سبز)، بی‌واک (نارنجی)، سکوت (خاکستری)', 
-          fontsize=16, fontfamily='DejaVu Sans', fontweight='bold')
-plt.xlabel('زمان (ثانیه)', fontsize=14)
-plt.ylabel('دامنه', fontsize=14)
+plt.title(farsi_text('سیگنال صوتی با طبقه‌بندی: واکدار (سبز)، بی‌واک (نارنجی)، سکوت (خاکستری)'), 
+          fontsize=16, fontweight='bold')
+plt.xlabel(farsi_text('زمان (ثانیه)'), fontsize=14)
+plt.ylabel(farsi_text('دامنه'), fontsize=14)
 plt.legend(loc='upper right', fontsize=12)
 plt.grid(True, alpha=0.3)
 
 # نمودار ویژگی‌های ترکیبی
 plt.subplot(2, 1, 2)
 ax1 = plt.gca()
-ax1.plot(frame_times, energy_norm, 'b-', linewidth=1.5, label='انرژی (نرمال‌سازی)', alpha=0.7)
-ax1.plot(frame_times, 1 - zcr_norm, 'r-', linewidth=1.5, label='1-ZCR (نرمال‌سازی)', alpha=0.7)
-ax1.plot(frame_times, autocorr_norm, 'g-', linewidth=1.5, label='اتوکرولیشن (نرمال‌سازی)', alpha=0.7)
-ax1.set_xlabel('زمان (ثانیه)', fontsize=14)
-ax1.set_ylabel('مقدار نرمال‌سازی شده', fontsize=14)
+ax1.plot(frame_times, energy_norm, 'b-', linewidth=1.5, label=farsi_text('انرژی (نرمال‌سازی)'), alpha=0.7)
+ax1.plot(frame_times, 1 - zcr_norm, 'r-', linewidth=1.5, label=farsi_text('1-ZCR (نرمال‌سازی)'), alpha=0.7)
+ax1.plot(frame_times, autocorr_norm, 'g-', linewidth=1.5, label=farsi_text('اتوکرولیشن (نرمال‌سازی)'), alpha=0.7)
+ax1.set_xlabel(farsi_text('زمان (ثانیه)'), fontsize=14)
+ax1.set_ylabel(farsi_text('مقدار نرمال‌سازی شده'), fontsize=14)
 ax1.legend(loc='upper right', fontsize=11)
 ax1.grid(True, alpha=0.3)
 
@@ -314,10 +325,10 @@ for i, (color, label) in enumerate(zip(colors, labels)):
     mask = classification_combined == i
     if np.any(mask):
         ax1.scatter(frame_times[mask], np.ones(np.sum(mask)) * (0.95 - i*0.1), 
-                   c=color, label=f'{label} (طبقه‌بندی)', s=15, alpha=0.6, marker='|')
+                   c=color, label=farsi_text(f'{label} (طبقه‌بندی)'), s=15, alpha=0.6, marker='|')
 
-plt.title('ویژگی‌های ترکیبی و طبقه‌بندی نهایی', 
-          fontsize=16, fontfamily='DejaVu Sans', fontweight='bold')
+plt.title(farsi_text('ویژگی‌های ترکیبی و طبقه‌بندی نهایی'), 
+          fontsize=16, fontweight='bold')
 
 plt.tight_layout()
 plt.savefig('part2e_final_result.png', dpi=150, bbox_inches='tight')

@@ -7,6 +7,14 @@ import numpy as np
 import matplotlib.pyplot as plt
 import soundfile as sf
 from scipy import signal
+import arabic_reshaper
+from bidi.algorithm import get_display
+
+def farsi_text(text):
+    """تبدیل متن فارسی برای نمایش صحیح در نمودارها"""
+    reshaped_text = arabic_reshaper.reshape(text)  # اصلاح شکل حروف
+    bidi_text = get_display(reshaped_text)  # راست‌چین کردن
+    return bidi_text
 
 # خواندن فایل صوتی
 audio_file = None
@@ -44,7 +52,7 @@ frame_shift_ms = 10
 frame_shift = int(sample_rate * frame_shift_ms / 1000)
 
 # تقسیم به فریم‌ها
-num_frames = int((len(audio_data) - frame_length) / frame_shift) + 1)
+num_frames = int((len(audio_data) - frame_length) / frame_shift) + 1
 frames = []
 
 for i in range(num_frames):
@@ -178,32 +186,35 @@ print(f"همپوشانی: {overlap} فریم ({overlap/num_frames*100:.1f}%)")
 # ایجاد نمودار
 plt.figure(figsize=(14, 12))
 
+# تنظیم فونت فارسی (اگر فونت خاصی دارید مسیر آن را بدهید، در غیر این صورت نام فونت نصب شده را بنویسید)
+# plt.rcParams[\'font.family\'] = \'Vazir\')
+
 # نمودار سیگنال اصلی
 time_axis = np.arange(len(audio_data)) / sample_rate
 plt.subplot(6, 1, 1)
 plt.plot(time_axis, audio_data, 'b-', linewidth=0.5)
-plt.title('سیگنال صوتی اصلی', fontsize=14, fontfamily='DejaVu Sans')
-plt.xlabel('زمان (ثانیه)', fontsize=12)
-plt.ylabel('دامنه', fontsize=12)
+plt.title(farsi_text('سیگنال صوتی اصلی'), fontsize=14)
+plt.xlabel(farsi_text('زمان (ثانیه)'), fontsize=12)
+plt.ylabel(farsi_text('دامنه'), fontsize=12)
 plt.grid(True, alpha=0.3)
 
 # نمودار قدرت اتوکرولیشن
 plt.subplot(6, 1, 2)
-plt.plot(frame_times, autocorr_strength, 'g-', linewidth=1.5, label='قدرت قله اتوکرولیشن')
+plt.plot(frame_times, autocorr_strength, 'g-', linewidth=1.5, label=farsi_text('قدرت قله اتوکرولیشن'))
 plt.axhline(y=autocorr_threshold, color='r', linestyle='--', 
-            label=f'آستانه: {autocorr_threshold:.3f}', alpha=0.7)
-plt.title('قدرت قله اتوکرولیشن', fontsize=14, fontfamily='DejaVu Sans')
-plt.xlabel('زمان (ثانیه)', fontsize=12)
-plt.ylabel('قدرت', fontsize=12)
+            label=farsi_text(f'آستانه: {autocorr_threshold:.3f}'), alpha=0.7)
+plt.title(farsi_text('قدرت قله اتوکرولیشن'), fontsize=14)
+plt.xlabel(farsi_text('زمان (ثانیه)'), fontsize=12)
+plt.ylabel(farsi_text('قدرت'), fontsize=12)
 plt.legend()
 plt.grid(True, alpha=0.3)
 
 # نمودار F0
 plt.subplot(6, 1, 3)
-plt.plot(frame_times, f0_values, 'm-', linewidth=1.5, label='فرکانس پایه (F0)')
-plt.title('فرکانس پایه (F0) از اتوکرولیشن', fontsize=14, fontfamily='DejaVu Sans')
-plt.xlabel('زمان (ثانیه)', fontsize=12)
-plt.ylabel('فرکانس (Hz)', fontsize=12)
+plt.plot(frame_times, f0_values, 'm-', linewidth=1.5, label=farsi_text('فرکانس پایه (F0)'))
+plt.title(farsi_text('فرکانس پایه (F0) از اتوکرولیشن'), fontsize=14)
+plt.xlabel(farsi_text('زمان (ثانیه)'), fontsize=12)
+plt.ylabel(farsi_text('فرکانس (Hz)'), fontsize=12)
 plt.ylim([0, 500])
 plt.legend()
 plt.grid(True, alpha=0.3)
@@ -212,10 +223,10 @@ plt.grid(True, alpha=0.3)
 plt.subplot(6, 1, 4)
 plt.plot(frame_times, zcr_values, 'r-', linewidth=1.5, label='ZCR')
 plt.axhline(y=voiced_zcr_threshold, color='g', linestyle='--', 
-            label='آستانه واکدار', alpha=0.7)
-plt.title('ZCR (برای مقایسه)', fontsize=14, fontfamily='DejaVu Sans')
-plt.xlabel('زمان (ثانیه)', fontsize=12)
-plt.ylabel('ZCR', fontsize=12)
+            label=farsi_text('آستانه واکدار'), alpha=0.7)
+plt.title(farsi_text('ZCR (برای مقایسه)'), fontsize=14)
+plt.xlabel(farsi_text('زمان (ثانیه)'), fontsize=12)
+plt.ylabel(farsi_text('ZCR'), fontsize=12)
 plt.legend()
 plt.grid(True, alpha=0.3)
 
@@ -228,9 +239,9 @@ for i, (color, label) in enumerate(zip(colors_autocorr, labels_autocorr)):
     if np.any(mask):
         plt.scatter(frame_times[mask], classification_autocorr[mask], 
                    c=color, label=label, s=20, alpha=0.6)
-plt.title('طبقه‌بندی با اتوکرولیشن', fontsize=14, fontfamily='DejaVu Sans')
-plt.xlabel('زمان (ثانیه)', fontsize=12)
-plt.ylabel('دسته', fontsize=12)
+plt.title(farsi_text('طبقه‌بندی با اتوکرولیشن'), fontsize=14)
+plt.xlabel(farsi_text('زمان (ثانیه)'), fontsize=12)
+plt.ylabel(farsi_text('دسته'), fontsize=12)
 plt.yticks([0, 1], ['غیر واکدار', 'واکدار'])
 plt.legend()
 plt.grid(True, alpha=0.3, axis='y')
@@ -238,13 +249,13 @@ plt.grid(True, alpha=0.3, axis='y')
 # نمودار مقایسه دو روش
 plt.subplot(6, 1, 6)
 plt.plot(frame_times, classification_previous, 'b-', linewidth=2, 
-         label='ZCR+انرژی', alpha=0.7)
+         label=farsi_text('ZCR+انرژی'), alpha=0.7)
 plt.plot(frame_times, classification_autocorr * 2, 'g--', linewidth=2, 
-         label='اتوکرولیشن (واکدار=2)', alpha=0.7)
-plt.title('مقایسه دو روش طبقه‌بندی', fontsize=14, fontfamily='DejaVu Sans')
-plt.xlabel('زمان (ثانیه)', fontsize=12)
-plt.ylabel('دسته', fontsize=12)
-plt.yticks([0, 1, 2], ['سکوت', 'بی‌واک', 'واکدار'])
+         label=farsi_text('اتوکرولیشن (واکدار=2)'), alpha=0.7)
+plt.title(farsi_text('مقایسه دو روش طبقه‌بندی'), fontsize=14)
+plt.xlabel(farsi_text('زمان (ثانیه)'), fontsize=12)
+plt.ylabel(farsi_text('دسته'), fontsize=12)
+plt.yticks([0, 1, 2], [farsi_text('سکوت'), farsi_text('بی‌واک'), farsi_text('واکدار')])
 plt.legend()
 plt.grid(True, alpha=0.3, axis='y')
 

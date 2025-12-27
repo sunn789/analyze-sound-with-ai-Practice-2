@@ -106,15 +106,6 @@ Each script saves its plots in PNG files:
 - `part2e_combined_method.png` - Combined method results
 - `part2e_final_result.png` - Final result with color-coded segments
 
-### About PNG Image Files
-
-**Important Note**: All PNG files in this project are generated from the attached audio file (`audio.flac`). These images represent the analysis and processing results of that specific audio file.
-
-**For Users and Contributors**:
-- If you replace the `audio.flac` file with your own audio file, all PNG images will be automatically regenerated based on your new audio file when you run the processing scripts again.
-- Each audio file has its unique characteristics, so the generated images will differ for different audio files.
-- To see results with your own audio file, simply replace the `audio.flac` file and re-run all the scripts.
-
 ## 🔬 Technical Details
 
 ### Short-term Energy

@@ -6,6 +6,14 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import soundfile as sf
+import arabic_reshaper
+from bidi.algorithm import get_display
+
+def farsi_text(text):
+    """تبدیل متن فارسی برای نمایش صحیح در نمودارها"""
+    reshaped_text = arabic_reshaper.reshape(text)  # اصلاح شکل حروف
+    bidi_text = get_display(reshaped_text)  # راست‌چین کردن
+    return bidi_text
 
 # خواندن فایل صوتی
 audio_file = None
@@ -101,35 +109,37 @@ short_term_energy = np.array(short_term_energy)
 # ایجاد نمودار
 plt.figure(figsize=(14, 10))
 
+# تنظیم فونت فارسی (اگر فونت خاصی دارید مسیر آن را بدهید، در غیر این صورت نام فونت نصب شده را بنویسید)
+# plt.rcParams['font.family'] = 'Vazir'
+
 # نمودار سیگنال اصلی
 time_axis = np.arange(len(audio_data)) / sample_rate
 plt.subplot(4, 1, 1)
 plt.plot(time_axis, audio_data, 'b-', linewidth=0.5)
-plt.title('سیگنال صوتی اصلی', fontsize=14, fontfamily='DejaVu Sans')
-plt.xlabel('زمان (ثانیه)', fontsize=12)
-plt.ylabel('دامنه', fontsize=12)
+plt.title(farsi_text('سیگنال صوتی اصلی'), fontsize=14)
+plt.xlabel(farsi_text('زمان (ثانیه)'), fontsize=12)
+plt.ylabel(farsi_text('دامنه'), fontsize=12)
 plt.grid(True, alpha=0.3)
 
 # نمودار ZCR
 plt.subplot(4, 1, 2)
 plt.plot(frame_times, zcr_values, 'r-', linewidth=1.5, label='ZCR')
 plt.axhline(y=np.mean(zcr_values), color='g', linestyle='--', 
-            label=f'میانگین: {np.mean(zcr_values):.4f}', alpha=0.7)
-plt.title('نرخ عبور از صفر (ZCR) برای هر فریم', fontsize=14, fontfamily='DejaVu Sans')
-plt.xlabel('زمان (ثانیه)', fontsize=12)
+            label=farsi_text(f'میانگین: {np.mean(zcr_values):.4f}'), alpha=0.7)
+plt.title(farsi_text('نرخ عبور از صفر (ZCR) برای هر فریم'), fontsize=14)
+plt.xlabel(farsi_text('زمان (ثانیه)'), fontsize=12)
 plt.ylabel('ZCR', fontsize=12)
 plt.legend()
 plt.grid(True, alpha=0.3)
 
 # نمودار ZCR نرمال‌سازی شده
 plt.subplot(4, 1, 3)
-plt.plot(frame_times, zcr_normalized, 'm-', linewidth=1.5, label='ZCR نرمال‌سازی شده')
+plt.plot(frame_times, zcr_normalized, 'm-', linewidth=1.5, label=farsi_text('ZCR نرمال‌سازی شده'))
 plt.axhline(y=np.mean(zcr_normalized), color='g', linestyle='--', 
-            label=f'میانگین: {np.mean(zcr_normalized):.2f}', alpha=0.7)
-plt.title('ZCR نرمال‌سازی شده (نسبت به نرخ نمونه‌برداری)', 
-          fontsize=14, fontfamily='DejaVu Sans')
-plt.xlabel('زمان (ثانیه)', fontsize=12)
-plt.ylabel('ZCR نرمال‌سازی شده', fontsize=12)
+            label=farsi_text(f'میانگین: {np.mean(zcr_normalized):.2f}'), alpha=0.7)
+plt.title(farsi_text('ZCR نرمال‌سازی شده (نسبت به نرخ نمونه‌برداری)'), fontsize=14)
+plt.xlabel(farsi_text('زمان (ثانیه)'), fontsize=12)
+plt.ylabel(farsi_text('ZCR نرمال‌سازی شده'), fontsize=12)
 plt.legend()
 plt.grid(True, alpha=0.3)
 
@@ -137,7 +147,7 @@ plt.grid(True, alpha=0.3)
 plt.subplot(4, 1, 4)
 ax1 = plt.gca()
 ax1.plot(frame_times, zcr_values, 'r-', linewidth=1.5, label='ZCR')
-ax1.set_xlabel('زمان (ثانیه)', fontsize=12)
+ax1.set_xlabel(farsi_text('زمان (ثانیه)'), fontsize=12)
 ax1.set_ylabel('ZCR', color='r', fontsize=12)
 ax1.tick_params(axis='y', labelcolor='r')
 ax1.grid(True, alpha=0.3)
@@ -145,11 +155,11 @@ ax1.grid(True, alpha=0.3)
 ax2 = ax1.twinx()
 energy_normalized = (short_term_energy - np.min(short_term_energy)) / \
                     (np.max(short_term_energy) - np.min(short_term_energy) + 1e-10)
-ax2.plot(frame_times, energy_normalized, 'b-', linewidth=1.5, alpha=0.7, label='انرژی (نرمال‌سازی شده)')
-ax2.set_ylabel('انرژی (نرمال‌سازی شده)', color='b', fontsize=12)
+ax2.plot(frame_times, energy_normalized, 'b-', linewidth=1.5, alpha=0.7, label=farsi_text('انرژی (نرمال‌سازی شده)'))
+ax2.set_ylabel(farsi_text('انرژی (نرمال‌سازی شده)'), color='b', fontsize=12)
 ax2.tick_params(axis='y', labelcolor='b')
 
-plt.title('مقایسه ZCR و انرژی کوتاه‌مدت', fontsize=14, fontfamily='DejaVu Sans')
+plt.title(farsi_text('مقایسه ZCR و انرژی کوتاه‌مدت'), fontsize=14)
 lines1, labels1 = ax1.get_legend_handles_labels()
 lines2, labels2 = ax2.get_legend_handles_labels()
 ax1.legend(lines1 + lines2, labels1 + labels2, loc='upper right')

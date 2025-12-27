@@ -1,7 +1,5 @@
 # Audio Signal Processing Project: Voiced/Unvoiced/Silence Detection
 
-[🇮🇷 فارسی](README_FA.md) | [🇬🇧 English](README_EN.md)
-
 A comprehensive audio signal processing project for identifying different speech segments in audio files using advanced signal processing techniques.
 
 ## 📋 Project Overview
@@ -61,9 +59,8 @@ This project implements a complete audio signal processing system that identifie
 ├── part2d_autocorrelation.py    # Detect voiced using autocorrelation
 ├── part2e_combined_method.py    # Combined method for final results
 ├── generate_report.py            # Generate Word report
-├── README.md                     # This file (English - default)
-├── README_FA.md                  # Persian documentation
-├── README_EN.md                  # Extended English documentation
+├── README.md                     # Persian documentation
+├── README_EN.md                  # English documentation (this file)
 ├── PROJECT_DESCRIPTION.md        # Project description for resume/LinkedIn
 └── explanations.md               # Detailed Persian explanations
 ```
@@ -163,9 +160,8 @@ This project covers the following concepts:
 
 ## 📚 Documentation Files
 
-- **README.md**: This file (English - default for GitHub)
-- **README_FA.md**: Persian usage guide
-- **README_EN.md**: Extended English documentation
+- **README.md**: Persian usage guide
+- **README_EN.md**: English usage guide (this file)
 - **explanations.md**: Detailed Persian explanations
 - **PROJECT_DESCRIPTION.md**: Project description for resume/LinkedIn
 
@@ -183,3 +179,4 @@ This project is developed as part of a signal processing course and can be used 
 ---
 
 **Note**: For proper Persian text display in the Word report, the 'B Nazanin' font should be installed on your system. You can modify the font in the code if needed.
+

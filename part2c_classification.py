@@ -6,6 +6,14 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import soundfile as sf
+import arabic_reshaper
+from bidi.algorithm import get_display
+
+def farsi_text(text):
+    """تبدیل متن فارسی برای نمایش صحیح در نمودارها"""
+    reshaped_text = arabic_reshaper.reshape(text)  # اصلاح شکل حروف
+    bidi_text = get_display(reshaped_text)  # راست‌چین کردن
+    return bidi_text
 
 # خواندن فایل صوتی
 audio_file = None
@@ -132,25 +140,28 @@ print(f"واکدار: {voiced_count} فریم ({voiced_count/num_frames*100:.1f}
 # ایجاد نمودار
 plt.figure(figsize=(14, 10))
 
+# تنظیم فونت فارسی (اگر فونت خاصی دارید مسیر آن را بدهید، در غیر این صورت نام فونت نصب شده را بنویسید)
+# plt.rcParams['font.family'] = 'Vazir'
+
 # نمودار سیگنال اصلی
 time_axis = np.arange(len(audio_data)) / sample_rate
 plt.subplot(5, 1, 1)
 plt.plot(time_axis, audio_data, 'b-', linewidth=0.5)
-plt.title('سیگنال صوتی اصلی', fontsize=14, fontfamily='DejaVu Sans')
-plt.xlabel('زمان (ثانیه)', fontsize=12)
-plt.ylabel('دامنه', fontsize=12)
+plt.title(farsi_text('سیگنال صوتی اصلی'), fontsize=14)
+plt.xlabel(farsi_text('زمان (ثانیه)'), fontsize=12)
+plt.ylabel(farsi_text('دامنه'), fontsize=12)
 plt.grid(True, alpha=0.3)
 
 # نمودار انرژی
 plt.subplot(5, 1, 2)
-plt.plot(frame_times, short_term_energy, 'b-', linewidth=1.5, label='انرژی')
+plt.plot(frame_times, short_term_energy, 'b-', linewidth=1.5, label=farsi_text('انرژی'))
 plt.axhline(y=silence_energy_threshold, color='r', linestyle='--', 
-            label='آستانه سکوت', alpha=0.7)
+            label=farsi_text('آستانه سکوت'), alpha=0.7)
 plt.axhline(y=voiced_energy_threshold, color='g', linestyle='--', 
-            label='آستانه واکدار', alpha=0.7)
-plt.title('انرژی کوتاه‌مدت', fontsize=14, fontfamily='DejaVu Sans')
-plt.xlabel('زمان (ثانیه)', fontsize=12)
-plt.ylabel('انرژی', fontsize=12)
+            label=farsi_text('آستانه واکدار'), alpha=0.7)
+plt.title(farsi_text('انرژی کوتاه‌مدت'), fontsize=14)
+plt.xlabel(farsi_text('زمان (ثانیه)'), fontsize=12)
+plt.ylabel(farsi_text('انرژی'), fontsize=12)
 plt.legend()
 plt.grid(True, alpha=0.3)
 
@@ -158,11 +169,11 @@ plt.grid(True, alpha=0.3)
 plt.subplot(5, 1, 3)
 plt.plot(frame_times, zcr_values, 'r-', linewidth=1.5, label='ZCR')
 plt.axhline(y=voiced_zcr_threshold, color='g', linestyle='--', 
-            label='آستانه واکدار', alpha=0.7)
+            label=farsi_text('آستانه واکدار'), alpha=0.7)
 plt.axhline(y=unvoiced_zcr_threshold, color='orange', linestyle='--', 
-            label='آستانه بی‌واک', alpha=0.7)
-plt.title('نرخ عبور از صفر (ZCR)', fontsize=14, fontfamily='DejaVu Sans')
-plt.xlabel('زمان (ثانیه)', fontsize=12)
+            label=farsi_text('آستانه بی‌واک'), alpha=0.7)
+plt.title(farsi_text('نرخ عبور از صفر (ZCR)'), fontsize=14)
+plt.xlabel(farsi_text('زمان (ثانیه)'), fontsize=12)
 plt.ylabel('ZCR', fontsize=12)
 plt.legend()
 plt.grid(True, alpha=0.3)
@@ -170,15 +181,15 @@ plt.grid(True, alpha=0.3)
 # نمودار طبقه‌بندی
 plt.subplot(5, 1, 4)
 colors = ['gray', 'orange', 'green']
-labels = ['سکوت', 'بی‌واک', 'واکدار']
+labels = [farsi_text('سکوت'), farsi_text('بی‌واک'), farsi_text('واکدار')]
 for i, (color, label) in enumerate(zip(colors, labels)):
     mask = classification == i
     if np.any(mask):
         plt.scatter(frame_times[mask], classification[mask], 
                    c=color, label=label, s=20, alpha=0.6)
-plt.title('طبقه‌بندی فریم‌ها', fontsize=14, fontfamily='DejaVu Sans')
-plt.xlabel('زمان (ثانیه)', fontsize=12)
-plt.ylabel('دسته', fontsize=12)
+plt.title(farsi_text('طبقه‌بندی فریم‌ها'), fontsize=14)
+plt.xlabel(farsi_text('زمان (ثانیه)'), fontsize=12)
+plt.ylabel(farsi_text('دسته'), fontsize=12)
 plt.yticks([0, 1, 2], labels)
 plt.legend()
 plt.grid(True, alpha=0.3, axis='y')
@@ -199,10 +210,9 @@ for i, (color, label) in enumerate(zip(colors, labels)):
         plt.plot(time_axis[mask], audio_data[mask], 
                 color=color, linewidth=1, label=label, alpha=0.7)
 
-plt.title('سیگنال با رنگ‌بندی بر اساس طبقه‌بندی', 
-          fontsize=14, fontfamily='DejaVu Sans')
-plt.xlabel('زمان (ثانیه)', fontsize=12)
-plt.ylabel('دامنه', fontsize=12)
+plt.title(farsi_text('سیگنال با رنگ‌بندی بر اساس طبقه‌بندی'), fontsize=14)
+plt.xlabel(farsi_text('زمان (ثانیه)'), fontsize=12)
+plt.ylabel(farsi_text('دامنه'), fontsize=12)
 plt.legend()
 plt.grid(True, alpha=0.3)
 

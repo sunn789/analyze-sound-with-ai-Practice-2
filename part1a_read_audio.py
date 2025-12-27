@@ -7,6 +7,14 @@ import numpy as np
 import matplotlib.pyplot as plt
 import soundfile as sf
 from scipy import signal
+import arabic_reshaper
+from bidi.algorithm import get_display
+
+def farsi_text(text):
+    """تبدیل متن فارسی برای نمایش صحیح در نمودارها"""
+    reshaped_text = arabic_reshaper.reshape(text)  # اصلاح شکل حروف
+    bidi_text = get_display(reshaped_text)  # راست‌چین کردن
+    return bidi_text
 
 # خواندن فایل صوتی
 # اگر فایل صوتی موجود نیست، یک سیگنال نمونه ایجاد می‌کنیم
@@ -53,22 +61,28 @@ if len(audio_data.shape) > 1:
 # ایجاد نمودار
 plt.figure(figsize=(14, 6))
 
+# تنظیم فونت فارسی (اگر فونت خاصی دارید مسیر آن را بدهید، در غیر این صورت نام فونت نصب شده را بنویسید)
+# plt.rcParams['font.family'] = 'Vazir'
+
 # نمودار سیگنال در دامنه زمانی
 time_axis = np.arange(len(audio_data)) / sample_rate
 plt.subplot(2, 1, 1)
 plt.plot(time_axis, audio_data)
-plt.title('سیگنال صوتی در دامنه زمانی', fontsize=14, fontfamily='DejaVu Sans')
-plt.xlabel('زمان (ثانیه)', fontsize=12)
-plt.ylabel('دامنه', fontsize=12)
+
+# استفاده از تابع farsi_text برای متون
+plt.title(farsi_text('سیگنال صوتی در دامنه زمانی'), fontsize=14)
+plt.xlabel(farsi_text('زمان (ثانیه)'), fontsize=12)
+plt.ylabel(farsi_text('دامنه'), fontsize=12)
 plt.grid(True, alpha=0.3)
 
 # نمودار طیف فرکانسی
 frequencies, spectrum = signal.welch(audio_data, sample_rate, nperseg=1024)
 plt.subplot(2, 1, 2)
 plt.semilogy(frequencies, spectrum)
-plt.title('طیف فرکانسی سیگنال', fontsize=14, fontfamily='DejaVu Sans')
-plt.xlabel('فرکانس (Hz)', fontsize=12)
-plt.ylabel('قدرت طیفی', fontsize=12)
+
+plt.title(farsi_text('طیف فرکانسی سیگنال'), fontsize=14)
+plt.xlabel(farsi_text('فرکانس (Hz)'), fontsize=12)
+plt.ylabel(farsi_text('قدرت طیفی'), fontsize=12)
 plt.grid(True, alpha=0.3)
 
 plt.tight_layout()

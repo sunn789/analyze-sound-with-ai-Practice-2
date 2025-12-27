@@ -7,6 +7,14 @@ import numpy as np
 import matplotlib.pyplot as plt
 import soundfile as sf
 from scipy import signal
+import arabic_reshaper
+from bidi.algorithm import get_display
+
+def farsi_text(text):
+    """تبدیل متن فارسی برای نمایش صحیح در نمودارها"""
+    reshaped_text = arabic_reshaper.reshape(text)  # اصلاح شکل حروف
+    bidi_text = get_display(reshaped_text)  # راست‌چین کردن
+    return bidi_text
 
 # خواندن فایل صوتی
 audio_file = None
@@ -84,38 +92,41 @@ frame_times = np.arange(num_frames) * frame_shift / sample_rate
 # ایجاد نمودار
 plt.figure(figsize=(14, 10))
 
+# تنظیم فونت فارسی (اگر فونت خاصی دارید مسیر آن را بدهید، در غیر این صورت نام فونت نصب شده را بنویسید)
+# plt.rcParams['font.family'] = 'Vazir'
+
 # نمودار سیگنال اصلی
 time_axis = np.arange(len(audio_data)) / sample_rate
 plt.subplot(4, 1, 1)
 plt.plot(time_axis, audio_data, linewidth=0.5)
-plt.title('سیگنال صوتی اصلی', fontsize=14, fontfamily='DejaVu Sans')
-plt.xlabel('زمان (ثانیه)', fontsize=12)
-plt.ylabel('دامنه', fontsize=12)
+plt.title(farsi_text('سیگنال صوتی اصلی'), fontsize=14)
+plt.xlabel(farsi_text('زمان (ثانیه)'), fontsize=12)
+plt.ylabel(farsi_text('دامنه'), fontsize=12)
 plt.grid(True, alpha=0.3)
 
 # نمودار انرژی کوتاه‌مدت
 plt.subplot(4, 1, 2)
 plt.plot(frame_times, short_term_energy, 'b-', linewidth=1.5)
-plt.title('انرژی کوتاه‌مدت', fontsize=14, fontfamily='DejaVu Sans')
-plt.xlabel('زمان (ثانیه)', fontsize=12)
-plt.ylabel('انرژی', fontsize=12)
+plt.title(farsi_text('انرژی کوتاه‌مدت'), fontsize=14)
+plt.xlabel(farsi_text('زمان (ثانیه)'), fontsize=12)
+plt.ylabel(farsi_text('انرژی'), fontsize=12)
 plt.grid(True, alpha=0.3)
 
 # نمودار دامنه کوتاه‌مدت (RMS)
 plt.subplot(4, 1, 3)
 plt.plot(frame_times, short_term_amplitude, 'g-', linewidth=1.5)
-plt.title('دامنه کوتاه‌مدت (RMS)', fontsize=14, fontfamily='DejaVu Sans')
-plt.xlabel('زمان (ثانیه)', fontsize=12)
-plt.ylabel('دامنه RMS', fontsize=12)
+plt.title(farsi_text('دامنه کوتاه‌مدت (RMS)'), fontsize=14)
+plt.xlabel(farsi_text('زمان (ثانیه)'), fontsize=12)
+plt.ylabel(farsi_text('دامنه RMS'), fontsize=12)
 plt.grid(True, alpha=0.3)
 
 # نمودار لگاریتم انرژی
 plt.subplot(4, 1, 4)
 log_energy = np.log10(short_term_energy + 1e-10)  # اضافه کردن مقدار کوچک برای جلوگیری از log(0)
 plt.plot(frame_times, log_energy, 'r-', linewidth=1.5)
-plt.title('لگاریتم انرژی کوتاه‌مدت', fontsize=14, fontfamily='DejaVu Sans')
-plt.xlabel('زمان (ثانیه)', fontsize=12)
-plt.ylabel('log(انرژی)', fontsize=12)
+plt.title(farsi_text('لگاریتم انرژی کوتاه‌مدت'), fontsize=14)
+plt.xlabel(farsi_text('زمان (ثانیه)'), fontsize=12)
+plt.ylabel(farsi_text('log(انرژی)'), fontsize=12)
 plt.grid(True, alpha=0.3)
 
 plt.tight_layout()

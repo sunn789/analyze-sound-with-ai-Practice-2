@@ -6,6 +6,14 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import soundfile as sf
+import arabic_reshaper
+from bidi.algorithm import get_display
+
+def farsi_text(text):
+    """تبدیل متن فارسی برای نمایش صحیح در نمودارها"""
+    reshaped_text = arabic_reshaper.reshape(text)  # اصلاح شکل حروف
+    bidi_text = get_display(reshaped_text)  # راست‌چین کردن
+    return bidi_text
 
 # خواندن فایل صوتی
 audio_file = None
@@ -80,20 +88,22 @@ for i in range(min(5, num_frames)):
 # ایجاد نمودار
 plt.figure(figsize=(14, 8))
 
+# تنظیم فونت فارسی (اگر فونت خاصی دارید مسیر آن را بدهید، در غیر این صورت نام فونت نصب شده را بنویسید)
+# plt.rcParams['font.family'] = 'Vazir'
+
 # نمودار سیگنال اصلی با نشان‌گذاری فریم‌ها
 time_axis = np.arange(len(audio_data)) / sample_rate
 plt.subplot(3, 1, 1)
-plt.plot(time_axis, audio_data, 'b-', linewidth=0.5, label='سیگنال اصلی')
+plt.plot(time_axis, audio_data, 'b-', linewidth=0.5, label=farsi_text('سیگنال اصلی'))
 
 # نمایش مرزهای فریم‌ها
 for i in range(0, num_frames, max(1, num_frames//20)):  # نمایش هر 20 فریم
     frame_time = frame_times[i]
     plt.axvline(x=frame_time, color='r', linestyle='--', alpha=0.3, linewidth=0.5)
 
-plt.title('سیگنال صوتی با نشان‌گذاری فریم‌های 20 میلی‌ثانیه‌ای', 
-          fontsize=14, fontfamily='DejaVu Sans')
-plt.xlabel('زمان (ثانیه)', fontsize=12)
-plt.ylabel('دامنه', fontsize=12)
+plt.title(farsi_text('سیگنال صوتی با نشان‌گذاری فریم‌های 20 میلی‌ثانیه‌ای'), fontsize=14)
+plt.xlabel(farsi_text('زمان (ثانیه)'), fontsize=12)
+plt.ylabel(farsi_text('دامنه'), fontsize=12)
 plt.legend()
 plt.grid(True, alpha=0.3)
 
@@ -103,10 +113,10 @@ num_sample_frames = min(10, num_frames)
 for i in range(0, num_sample_frames, 2):
     frame_time_samples = np.arange(len(frames[i])) / sample_rate + frame_times[i]
     plt.plot(frame_time_samples, frames[i], linewidth=1, 
-             label=f'فریم {i+1}' if i < 4 else '')
-plt.title('نمایش چند فریم نمونه', fontsize=14, fontfamily='DejaVu Sans')
-plt.xlabel('زمان (ثانیه)', fontsize=12)
-plt.ylabel('دامنه', fontsize=12)
+             label=farsi_text(f'فریم {i+1}') if i < 4 else '')
+plt.title(farsi_text('نمایش چند فریم نمونه'), fontsize=14)
+plt.xlabel(farsi_text('زمان (ثانیه)'), fontsize=12)
+plt.ylabel(farsi_text('دامنه'), fontsize=12)
 plt.legend()
 plt.grid(True, alpha=0.3)
 
@@ -114,9 +124,9 @@ plt.grid(True, alpha=0.3)
 plt.subplot(3, 1, 3)
 frame_lengths = [len(frame) for frame in frames]
 plt.hist(frame_lengths, bins=20, edgecolor='black', alpha=0.7)
-plt.title('توزیع طول فریم‌ها', fontsize=14, fontfamily='DejaVu Sans')
-plt.xlabel('طول فریم (تعداد نمونه)', fontsize=12)
-plt.ylabel('تعداد فریم‌ها', fontsize=12)
+plt.title(farsi_text('توزیع طول فریم‌ها'), fontsize=14)
+plt.xlabel(farsi_text('طول فریم (تعداد نمونه)'), fontsize=12)
+plt.ylabel(farsi_text('تعداد فریم‌ها'), fontsize=12)
 plt.grid(True, alpha=0.3, axis='y')
 
 plt.tight_layout()

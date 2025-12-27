@@ -10,9 +10,25 @@ from docx.oxml.ns import qn
 from docx.oxml import OxmlElement
 import os
 from datetime import datetime
+import arabic_reshaper
+
+def reshape_arabic_text(text):
+    """تبدیل متن فارسی/عربی برای نمایش صحیح در Word"""
+    try:
+        # فقط reshape می‌کنیم، get_display برای Word لازم نیست
+        # چون Word خودش RTL را مدیریت می‌کند
+        # reshape باعث اتصال صحیح حروف فارسی می‌شود
+        reshaped_text = arabic_reshaper.reshape(text)
+        return reshaped_text
+    except Exception as e:
+        # در صورت خطا، متن اصلی را برمی‌گرداند
+        print(f"Warning: Could not reshape text: {e}")
+        return text
 
 def add_heading_rtl(doc, text, level=1):
     """افزودن عنوان با راست‌چین"""
+    # تبدیل متن برای نمایش صحیح فارسی
+    text = reshape_arabic_text(text)
     heading = doc.add_heading(text, level=level)
     heading.alignment = WD_ALIGN_PARAGRAPH.RIGHT
     for run in heading.runs:
@@ -22,6 +38,8 @@ def add_heading_rtl(doc, text, level=1):
 
 def add_paragraph_rtl(doc, text, bold=False, font_size=11):
     """افزودن پاراگراف با راست‌چین"""
+    # تبدیل متن برای نمایش صحیح فارسی
+    text = reshape_arabic_text(text)
     para = doc.add_paragraph()
     para.alignment = WD_ALIGN_PARAGRAPH.RIGHT
     run = para.add_run(text)
@@ -43,7 +61,9 @@ def add_image_to_doc(doc, image_path, width=6, caption=""):
         if caption:
             caption_para = doc.add_paragraph()
             caption_para.alignment = WD_ALIGN_PARAGRAPH.CENTER
-            caption_run = caption_para.add_run(caption)
+            # تبدیل متن برای نمایش صحیح فارسی
+            caption_reshaped = reshape_arabic_text(caption)
+            caption_run = caption_para.add_run(caption_reshaped)
             caption_run.font.name = 'B Nazanin'
             caption_run._element.rPr.rFonts.set(qn('w:eastAsia'), 'B Nazanin')
             caption_run.font.size = Pt(10)
@@ -66,7 +86,8 @@ def create_report():
     # صفحه عنوان
     title_para = doc.add_paragraph()
     title_para.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    title_run = title_para.add_run('گزارش پروژه پردازش سیگنال صوتی')
+    title_text = reshape_arabic_text('گزارش پروژه پردازش سیگنال صوتی')
+    title_run = title_para.add_run(title_text)
     title_run.font.name = 'B Nazanin'
     title_run._element.rPr.rFonts.set(qn('w:eastAsia'), 'B Nazanin')
     title_run.font.size = Pt(18)
@@ -76,7 +97,8 @@ def create_report():
     
     subtitle_para = doc.add_paragraph()
     subtitle_para.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    subtitle_run = subtitle_para.add_run('تشخیص بخش‌های واکدار، بی‌واک و سکوت')
+    subtitle_text = reshape_arabic_text('تشخیص بخش‌های واکدار، بی‌واک و سکوت')
+    subtitle_run = subtitle_para.add_run(subtitle_text)
     subtitle_run.font.name = 'B Nazanin'
     subtitle_run._element.rPr.rFonts.set(qn('w:eastAsia'), 'B Nazanin')
     subtitle_run.font.size = Pt(14)
@@ -85,7 +107,8 @@ def create_report():
     
     date_para = doc.add_paragraph()
     date_para.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    date_run = date_para.add_run(f'تاریخ: {datetime.now().strftime("%Y/%m/%d")}')
+    date_text = reshape_arabic_text(f'تاریخ: {datetime.now().strftime("%Y/%m/%d")}')
+    date_run = date_para.add_run(date_text)
     date_run.font.name = 'B Nazanin'
     date_run._element.rPr.rFonts.set(qn('w:eastAsia'), 'B Nazanin')
     date_run.font.size = Pt(11)
@@ -281,6 +304,7 @@ def create_report():
     doc.save(output_file)
     print(f"✅ گزارش با موفقیت در فایل '{output_file}' ذخیره شد.")
     print("⚠ توجه: برای نمایش صحیح متن فارسی، فونت 'B Nazanin' باید در سیستم شما نصب باشد.")
+    print("✅ از کتابخانه arabic-reshaper برای اتصال صحیح حروف فارسی استفاده شده است.")
     
     return output_file
 
